@@ -88,7 +88,6 @@
       const text = userInput.value.trim();
       if (!text) return;
 
-      // 显示用户消息
       const userMsg = document.createElement("div");
       userMsg.className = "chat-message";
       userMsg.innerHTML = `<strong>你：</strong> ${text}`;
@@ -96,7 +95,6 @@
       userInput.value = "";
       chatBox.scrollTop = chatBox.scrollHeight;
 
-      // 切换为思考头像
       avatar.src = "./moss_think.png";
 
       try {
@@ -105,7 +103,7 @@
           headers: {
             "Content-Type": "application/json"
           },
-          body: JSON.stringify({ message: text })  // ✅ 正确字段
+          body: JSON.stringify({ message: text })
         });
 
         const data = await response.json();
@@ -113,7 +111,6 @@
           throw new Error(data.error?.message || "请求失败");
         }
 
-        // 回复
         const botMsg = document.createElement("div");
         botMsg.className = "chat-message";
         botMsg.innerHTML = `<strong>Mr.Moss：</strong> ${data.reply}`;
@@ -125,7 +122,6 @@
         errMsg.innerHTML = `<strong>Mr.Moss：</strong> 🤖 出错啦：${err.message}`;
         chatBox.appendChild(errMsg);
       } finally {
-        // 恢复微笑头像
         avatar.src = "./moss_smile.png";
         chatBox.scrollTop = chatBox.scrollHeight;
       }
