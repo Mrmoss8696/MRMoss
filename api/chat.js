@@ -15,7 +15,7 @@ export default async function handler(req, res) {
         Authorization: `Bearer ${apiKey}`,
       },
       body: JSON.stringify({
-        model: "gpt-4",
+        model: "gpt-3.5-turbo",
         messages: [
           { role: "system", content: "你是一个神秘灵感型的 AI，名叫 Mr.Moss，用温柔、智慧的语气回答用户。" },
           { role: "user", content: userMessage }
