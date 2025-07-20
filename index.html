@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mr.Moss 聊天界面</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f0f4ec;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+    }
+    header {
+      background: #5e8c61;
+      color: white;
+      padding: 15px;
+      font-size: 24px;
+    }
+    .chat-container {
+      flex: 1;
+      display: flex;
+      flex-direction: row;
+    }
+    .chat-box {
+      flex: 3;
+      padding: 20px;
+      overflow-y: auto;
+      background: white;
+    }
+    .chat-message {
+      margin-bottom: 10px;
+    }
+    .input-box {
+      display: flex;
+      padding: 10px;
+      background: #ddd;
+    }
+    .input-box input {
+      flex: 1;
+      padding: 10px;
+      font-size: 16px;
+    }
+    .input-box button {
+      padding: 10px;
+      font-size: 16px;
+      background: #5e8c61;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+    .avatar-box {
+      flex: 1;
+      background: #d9ead3;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .avatar-box img {
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      border: 4px solid #5e8c61;
+    }
+  </style>
+</head>
+<body>
+  <header>Mr.Moss 表情聊天</header>
+  <div class="chat-container">
+    <div class="chat-box" id="chatBox"></div>
+    <div class="avatar-box">
+      <img id="avatar" src="./moss_smile.png" alt="Mr.Moss头像">
+    </div>
+  </div>
+  <div class="input-box">
+    <input type="text" id="userInput" placeholder="输入消息..." onkeydown="if(event.key === 'Enter'){sendMessage()}" />
+    <button onclick="sendMessage()">发送</button>
+  </div>
+
+  <script>
+    async function sendMessage() {
+      const userInput = document.getElementById("userInput");
+      const chatBox = document.getElementById("chatBox");
+      const avatar = document.getElementById("avatar");
+      const text = userInput.value.trim();
+      if (!text) return;
+
+      const userMsg = document.createElement("div");
+      userMsg.className = "chat-message";
+      userMsg.innerHTML = `<strong>你：</strong> ${text}`;
+      chatBox.appendChild(userMsg);
+
+      userInput.value = "";
+      chatBox.scrollTop = chatBox.scrollHeight;
+
+      avatar.src = "./moss_think.png";
+
+      try {
+        const response = await fetch("https://your-vercel-project.vercel.app/api/chat", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            model: "gpt-4",
+            messages: [
+              { role: "system", content: "你是一个神秘灵感型的 AI，名叫 Mr.Moss，用温柔、智慧的语气回答用户。" },
+              { role: "user", content: text }
+            ]
+          })
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          throw new Error(data.error?.message || "请求失败");
+        }
+
+        const reply = data.choices[0].message.content;
+
+        avatar.src = "./moss_smile.png";
+
+        const botMsg = document.createElement("div");
+        botMsg.className = "chat-message";
+        botMsg.innerHTML = `<strong>Mr.Moss：</strong> ${reply}`;
+        chatBox.appendChild(botMsg);
+        chatBox.scrollTop = chatBox.scrollHeight;
+      } catch (err) {
+        avatar.src = "./moss_smile.png";
+        const errMsg = document.createElement("div");
+        errMsg.className = "chat-message";
+        errMsg.innerHTML = `<strong>Mr.Moss：</strong> 🤖 出错啦：${err.message}`;
+        chatBox.appendChild(errMsg);
+        chatBox.scrollTop = chatBox.scrollHeight;
+      }
+    }
+  </script>
+</body>
+</html>
