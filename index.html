@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="zh">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Mr.Moss 聊天界面</title>
   <style>
     body {
@@ -72,7 +72,7 @@
   <div class="chat-container">
     <div class="chat-box" id="chatBox"></div>
     <div class="avatar-box">
-      <img id="avatar" src="./moss_smile.png" alt="Mr.Moss头像">
+      <img id="avatar" src="./moss_smile.png" alt="Mr.Moss头像" />
     </div>
   </div>
   <div class="input-box">
@@ -88,14 +88,15 @@
       const text = userInput.value.trim();
       if (!text) return;
 
+      // 显示用户消息
       const userMsg = document.createElement("div");
       userMsg.className = "chat-message";
       userMsg.innerHTML = `<strong>你：</strong> ${text}`;
       chatBox.appendChild(userMsg);
-
       userInput.value = "";
       chatBox.scrollTop = chatBox.scrollHeight;
 
+      // 切换为思考头像
       avatar.src = "./moss_think.png";
 
       try {
@@ -104,36 +105,28 @@
           headers: {
             "Content-Type": "application/json"
           },
-          body: JSON.stringify({
-            model: "gpt-4",
-            messages: [
-              { role: "system", content: "你是一个神秘灵感型的 AI，名叫 Mr.Moss，用温柔、智慧的语气回答用户。" },
-              { role: "user", content: text }
-            ]
-          })
+          body: JSON.stringify({ message: text })  // ✅ 正确字段
         });
 
         const data = await response.json();
-
         if (!response.ok) {
           throw new Error(data.error?.message || "请求失败");
         }
 
-        const reply = data.choices[0].message.content;
-
-        avatar.src = "./moss_smile.png";
-
+        // 回复
         const botMsg = document.createElement("div");
         botMsg.className = "chat-message";
-        botMsg.innerHTML = `<strong>Mr.Moss：</strong> ${reply}`;
+        botMsg.innerHTML = `<strong>Mr.Moss：</strong> ${data.reply}`;
         chatBox.appendChild(botMsg);
         chatBox.scrollTop = chatBox.scrollHeight;
       } catch (err) {
-        avatar.src = "./moss_smile.png";
         const errMsg = document.createElement("div");
         errMsg.className = "chat-message";
         errMsg.innerHTML = `<strong>Mr.Moss：</strong> 🤖 出错啦：${err.message}`;
         chatBox.appendChild(errMsg);
+      } finally {
+        // 恢复微笑头像
+        avatar.src = "./moss_smile.png";
         chatBox.scrollTop = chatBox.scrollHeight;
       }
     }
